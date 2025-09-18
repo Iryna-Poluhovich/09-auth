@@ -2,7 +2,7 @@
 
 import css from "./NoteList.module.css"
 import type { Note } from "../../types/note"
-import { deleteNote } from "@/lib/api"
+import { deleteNote } from "@/lib/api/clientApi"
 import { Loading } from "notiflix"
 import toast from "react-hot-toast"
 import { useMutation, useQueryClient } from "@tanstack/react-query"

@@ -2,20 +2,23 @@
 
 import { Routes } from "@/config/routes"
 import css from "./TagsMenu.module.css"
-import { Tags } from "@/lib/api"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getCategories, Tags } from "@/lib/api/clientApi"
 
-interface TagsMenuProps {
-	categories: Tags
-}
-
-const TagsMenu = ({ categories }: TagsMenuProps) => {
+const TagsMenu = () => {
 	const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false)
+	const [categories, setCategories] = useState<Tags>(Tags)
 
-	const handleClick = () => {
-		setIsNotesOpen(!isNotesOpen)
-	}
+	const handleClick = () => setIsNotesOpen(!isNotesOpen)
+
+	useEffect(() => {
+		const fetchCategories = async () => {
+			const data = await getCategories()
+			setCategories(data)
+		}
+		fetchCategories()
+	}, [])
 
 	return (
 		<div className={css.menuContainer}>

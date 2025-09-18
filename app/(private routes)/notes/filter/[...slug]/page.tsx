@@ -3,9 +3,10 @@ import {
 	HydrationBoundary,
 	QueryClient,
 } from "@tanstack/react-query"
-import { fetchNotes, getCategories, Tags } from "@/lib/api"
+import { Tags } from "@/lib/api/clientApi"
 import NotesClient from "./Notes.client"
 import { Metadata } from "next"
+import { fetchServerNotes } from "@/lib/api/serverApi"
 
 interface NotesFilterProps {
 	params: Promise<{ slug: Tags }>
@@ -55,29 +56,24 @@ export async function generateMetadata({
 					alt: "NoteHub - Share Notes Instantly Online",
 				},
 			],
-			creator: "github.com/Iryna-Poluhovich",
+			creator: "github.com/codingweb123",
 		},
 	}
-}
-
-export const generateStaticParams = async () => {
-	const categories = await getCategories()
-	return categories.map(category => ({ slug: [category] }))
 }
 
 export default async function NotesFilter({ params }: NotesFilterProps) {
 	const queryClient = new QueryClient()
 	const { slug } = await params
-	const tag = slug[0] === "All" ? undefined : slug[0]
+	const category = slug[0] === "All" ? undefined : slug[0]
 
 	await queryClient.prefetchQuery({
-		queryKey: ["notes", { search: "", page: 1, tag }],
-		queryFn: () => fetchNotes("", 1, tag),
+		queryKey: ["notes", { search: "", page: 1, category }],
+		queryFn: () => fetchServerNotes("", 1, undefined, category),
 	})
 
 	return (
 		<HydrationBoundary state={dehydrate(queryClient)}>
-			<NotesClient tag={tag} />
+			<NotesClient category={category} />
 		</HydrationBoundary>
 	)
 }

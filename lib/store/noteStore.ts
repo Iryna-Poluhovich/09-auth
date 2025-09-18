@@ -1,35 +1,35 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import type { Tag } from "@/lib/api"
+import { Tags } from "../api/clientApi"
 
-const initialDraft = {
-  title: "",
-  content: "",
-  tag: "Todo" as Tag,
+export interface NewNoteData {
+	title: string
+	content: string
+	tag: Tags[number]
 }
 
-type Draft = typeof initialDraft
-
-interface NoteStore {
-  draft: Draft
-  setDraft: (note: Partial<Draft>) => void
-  clearDraft: () => void
+interface NoteDraftStore {
+	draft: NewNoteData
+	setDraft: (note: NewNoteData) => void
+	clearDraft: () => void
 }
 
-export const useNoteStore = create<NoteStore>()(
-  persist(
-    (set) => ({
-      draft: initialDraft,
-      setDraft: (note) =>
-        set((state) => ({
-          draft: { ...state.draft, ...note },
-        })),
-      clearDraft: () => set({ draft: initialDraft }),
-    }),
-    {
-      name: "note-draft", 
-    }
-  )
+const initialDraft: NewNoteData = {
+	title: "",
+	content: "",
+	tag: "Todo",
+}
+
+export const useNoteDraftStore = create<NoteDraftStore>()(
+	persist(
+		set => ({
+			draft: initialDraft,
+			setDraft: note => set(() => ({ draft: note })),
+			clearDraft: () => set(() => ({ draft: initialDraft })),
+		}),
+		{
+			name: "note-draft",
+			partialize: state => ({ draft: state.draft }),
+		}
+	)
 )
-
-export { initialDraft }
